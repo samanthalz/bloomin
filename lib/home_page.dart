@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'donation_page.dart';
 import 'learning_page.dart';
 import 'profile_page.dart';
+import 'period_tracker_page.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home';
@@ -16,7 +17,8 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    Center(child: Text('Home Page')), // Replace with actual Home widget if needed
+    Center(child: Text('Home Page')),
+    const PeriodTrackerPage(),
     const DonationPage(),
     const LearningPage(),
     const ProfilePage(),
@@ -40,6 +42,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Tracker',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.volunteer_activism),
