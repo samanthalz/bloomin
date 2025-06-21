@@ -1,3 +1,4 @@
+import 'package:bloomin/login_page.dart';
 import 'package:flutter/material.dart';
 
 class SignupPage extends StatefulWidget {
@@ -214,11 +215,7 @@ class _SignupPageState extends State<SignupPage> {
                       const SizedBox(width: 4),
                       InkWell(
                         onTap: () {
-                          widget.controller.animateToPage(
-                            0,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.ease,
-                          );
+                          Navigator.pushNamed(context, LoginPage.routeName);
                         },
                         child: const Text(
                           'Log In',

@@ -122,7 +122,10 @@ class _LoginPageState extends State<LoginPage> {
                     width: 329,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        // TODO: Add login validation logic here if needed
+                        Navigator.pushReplacementNamed(context, '/home');
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF9F7BFF),
                       ),
@@ -153,14 +156,8 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(width: 2.5),
                     InkWell(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SignupPage(controller: widget.controller),
-                          ),
-                        );
+                        Navigator.pushNamed(context, SignupPage.routeName);
                       },
-
 
                       child: Text(
                         'Sign Up',
@@ -175,13 +172,18 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 const SizedBox(height: 15),
-                const Text(
-                  'Forget Password?',
-                  style: TextStyle(
-                    color: Color(0xFF755DC1),
-                    fontSize: 15,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, SignupPage.routeName);
+                  },
+                  child: const Text(
+                    'Forget Password',
+                    style: TextStyle(
+                      color: Color(0xFF755DC1),
+                      fontSize: 15,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
