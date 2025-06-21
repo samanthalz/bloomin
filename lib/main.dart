@@ -32,14 +32,14 @@ class MyApp extends StatelessWidget {
       // 👇 Register all your named routes here
       routes: {
         LoginPage.routeName: (context) => LoginPage(controller: pageController),
-        SignupPage.routeName: (context) => SignupPage(controller: pageController),
+        SignupPage.routeName:
+            (context) => SignupPage(controller: pageController),
         HomePage.routeName: (context) => const HomePage(),
         ProfilePage.routeName: (context) => const ProfilePage(),
         LearningPage.routeName: (context) => const LearningPage(),
         DonationPage.routeName: (context) => const DonationPage(),
         PeriodTrackerPage.routeName: (context) => const PeriodTrackerPage(),
-
-    },
+      },
     );
   }
 }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class PeriodTrackerPage extends StatelessWidget {
-  static const routeName = '/period';
+  static const routeName = '/period'; // ✅ Add this line
+
   const PeriodTrackerPage({super.key});
 
   @override
@@ -14,3 +15,4 @@ class PeriodTrackerPage extends StatelessWidget {
     );
   }
 }
+
