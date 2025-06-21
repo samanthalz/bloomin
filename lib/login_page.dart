@@ -18,19 +18,20 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xFF735276),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 15, top: 70, bottom: 50),
-            child: Image.asset(
-              "assets/img/Bloomin_logo.png",
-              width: double.infinity,
-
-              fit: BoxFit.fill,
+            padding: const EdgeInsets.only(top: 70, bottom: 50),
+              child:Center(
+                child: Image.asset(
+                "assets/img/Bloomin_logo.png",
+                width: 350,
+                fit: BoxFit.contain,
+                ),
+              )
             ),
-          ),
           const SizedBox(height: 18),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -41,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
                 const Text(
                   'Log In',
                   style: TextStyle(
-                    color: Color(0xFF755DC1),
+                    color: Color(0xFF29264C),
                     fontSize: 27,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w500,
@@ -59,8 +60,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   decoration: const InputDecoration(
                     labelText: 'Email',
+                    filled: true,
+                    fillColor: Color(0xFFE7DAF5),
                     labelStyle: TextStyle(
-                      color: Color(0xFF755DC1),
+                      color: Color(0xFF786B89),
                       fontSize: 15,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
@@ -93,8 +96,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   decoration: const InputDecoration(
                     labelText: 'Password',
+                    filled: true,
+                    fillColor: Color(0xFFE7DAF5),
                     labelStyle: TextStyle(
-                      color: Color(0xFF755DC1),
+                      color: Color(0xFF786B89),
                       fontSize: 15,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
@@ -122,17 +127,14 @@ class _LoginPageState extends State<LoginPage> {
                     width: 329,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // TODO: Add login validation logic here if needed
-                        Navigator.pushReplacementNamed(context, '/home');
-                      },
+                      onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF9F7BFF),
                       ),
                       child: const Text(
                         'Sign In',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Color(0xFFF0E6FD),
                           fontSize: 15,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
@@ -147,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                     const Text(
                       'Don’t have an account?',
                       style: TextStyle(
-                        color: Color(0xFF837E93),
+                        color: Color(0xFFAB95CA),
                         fontSize: 15,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w500,
@@ -156,13 +158,19 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(width: 2.5),
                     InkWell(
                       onTap: () {
-                        Navigator.pushNamed(context, SignupPage.routeName);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignupPage(controller: widget.controller),
+                          ),
+                        );
                       },
+
 
                       child: Text(
                         'Sign Up',
                         style: const TextStyle(
-                          color: Color(0xFF755DC1),
+                          color: Color(0xFF846BD6),
                           fontSize: 15,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
@@ -172,18 +180,13 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 const SizedBox(height: 15),
-                InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, SignupPage.routeName);
-                  },
-                  child: const Text(
-                    'Forget Password',
-                    style: TextStyle(
-                      color: Color(0xFF755DC1),
-                      fontSize: 15,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
+                const Text(
+                  'Forget Password?',
+                  style: TextStyle(
+                    color: Color(0xFF846BD6),
+                    fontSize: 15,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
