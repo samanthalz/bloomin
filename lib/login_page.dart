@@ -18,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xFF735276),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
