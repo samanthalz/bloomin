@@ -23,14 +23,15 @@ class _LoginPageState extends State<LoginPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 15, top: 70, bottom: 50),
-            child: Image.asset(
-              "assets/img/Bloomin_logo.png",
-              width: double.infinity,
-
-              fit: BoxFit.fill,
+            padding: const EdgeInsets.only(top: 70, bottom: 50),
+              child:Center(
+                child: Image.asset(
+                "assets/img/Bloomin_logo.png",
+                width: 350,
+                fit: BoxFit.contain,
+                ),
+              )
             ),
-          ),
           const SizedBox(height: 18),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50),
