@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
                 const Text(
                   'Log In',
                   style: TextStyle(
-                    color: Color(0xFF755DC1),
+                    color: Color(0xFF29264C),
                     fontSize: 27,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w500,
@@ -60,8 +60,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   decoration: const InputDecoration(
                     labelText: 'Email',
+                    filled: true,
+                    fillColor: Color(0xFFE7DAF5),
                     labelStyle: TextStyle(
-                      color: Color(0xFF755DC1),
+                      color: Color(0xFF786B89),
                       fontSize: 15,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
@@ -94,8 +96,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   decoration: const InputDecoration(
                     labelText: 'Password',
+                    filled: true,
+                    fillColor: Color(0xFFE7DAF5),
                     labelStyle: TextStyle(
-                      color: Color(0xFF755DC1),
+                      color: Color(0xFF786B89),
                       fontSize: 15,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
@@ -130,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: const Text(
                         'Sign In',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Color(0xFFF0E6FD),
                           fontSize: 15,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
@@ -145,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                     const Text(
                       'Don’t have an account?',
                       style: TextStyle(
-                        color: Color(0xFF837E93),
+                        color: Color(0xFFAB95CA),
                         fontSize: 15,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w500,
@@ -166,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: Text(
                         'Sign Up',
                         style: const TextStyle(
-                          color: Color(0xFF755DC1),
+                          color: Color(0xFF846BD6),
                           fontSize: 15,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
@@ -179,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                 const Text(
                   'Forget Password?',
                   style: TextStyle(
-                    color: Color(0xFF755DC1),
+                    color: Color(0xFF846BD6),
                     fontSize: 15,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w500,

@@ -199,7 +199,7 @@ class _SignupPageState extends State<SignupPage> {
                         child: const Text(
                           'Create account',
                           style: TextStyle(
-                            color: Color(0xFFE5D0FF),
+                            color: Color(0xFFF0E6FD),
                             fontSize: 15,
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w500,
