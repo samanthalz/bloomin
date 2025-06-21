@@ -25,7 +25,7 @@ class _SignupPageState extends State<SignupPage> {
           Padding(
             padding: const EdgeInsets.only(top: 0),
             child: Image.asset(
-              "assets/images/vector-2.png",
+              "assets/img/Bloomin_logo.png",
               width: 428,
               height: 457,
             ),
