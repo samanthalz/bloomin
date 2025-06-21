@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:bloomin/login.dart';
-// import other pages like home, signup etc.
+import 'package:bloomin/login_page.dart';
+import 'package:bloomin/signup_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
       // 👇 Register all your named routes here
       routes: {
         LoginPage.routeName: (context) => LoginPage(controller: pageController),
+        SignupPage.routeName: (context) => SignupPage(controller: pageController),
         // Add more pages as needed
         // MyHomePage.routeName: (context) => const MyHomePage(),
         // SignupPage.routeName: (context) => SignupPage(controller: pageController),

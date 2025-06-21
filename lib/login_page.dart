@@ -1,3 +1,4 @@
+import 'package:bloomin/signup_page.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -9,7 +10,6 @@ class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
-
 
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
@@ -23,17 +23,15 @@ class _LoginPageState extends State<LoginPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 15, top: 15),
+            padding: const EdgeInsets.only(left: 15, top: 70, bottom: 50),
             child: Image.asset(
-              "assets/img/vector-1.png",
+              "assets/img/Bloomin_logo.png",
               width: double.infinity,
 
               fit: BoxFit.fill,
             ),
           ),
-          const SizedBox(
-            height: 18,
-          ),
+          const SizedBox(height: 18),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50),
             child: Column(
@@ -49,9 +47,7 @@ class _LoginPageState extends State<LoginPage> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(
-                  height: 50,
-                ),
+                const SizedBox(height: 50),
                 TextField(
                   controller: _emailController,
                   textAlign: TextAlign.center,
@@ -85,15 +81,13 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
                 TextField(
                   controller: _passController,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Color(0xFF393939),
-                    fontSize: 13,
+                    fontSize: 15,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w400,
                   ),
@@ -121,9 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 25,
-                ),
+                const SizedBox(height: 25),
                 ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
                   child: SizedBox(
@@ -146,34 +138,28 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                const SizedBox(height: 15),
                 Row(
                   children: [
                     const Text(
                       'Don’t have an account?',
                       style: TextStyle(
                         color: Color(0xFF837E93),
-                        fontSize: 13,
+                        fontSize: 15,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(
-                      width: 2.5,
-                    ),
+                    const SizedBox(width: 2.5),
                     InkWell(
                       onTap: () {
-                        widget.controller.animateToPage(1,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.ease);
+                        Navigator.pushNamed(context, SignupPage.routeName);
                       },
-                      child: const Text(
+                      child: Text(
                         'Sign Up',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xFF755DC1),
-                          fontSize: 13,
+                          fontSize: 15,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
                         ),
@@ -181,14 +167,12 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                const SizedBox(height: 15),
                 const Text(
                   'Forget Password?',
                   style: TextStyle(
                     color: Color(0xFF755DC1),
-                    fontSize: 13,
+                    fontSize: 15,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w500,
                   ),
