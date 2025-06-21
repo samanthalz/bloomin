@@ -28,9 +28,6 @@ class MyApp extends StatelessWidget {
       routes: {
         LoginPage.routeName: (context) => LoginPage(controller: pageController),
         SignupPage.routeName: (context) => SignupPage(controller: pageController),
-        // Add more pages as needed
-        // MyHomePage.routeName: (context) => const MyHomePage(),
-        // SignupPage.routeName: (context) => SignupPage(controller: pageController),
       },
     );
   }

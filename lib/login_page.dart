@@ -154,8 +154,15 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(width: 2.5),
                     InkWell(
                       onTap: () {
-                        Navigator.pushNamed(context, SignupPage.routeName);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignupPage(controller: widget.controller),
+                          ),
+                        );
                       },
+
+
                       child: Text(
                         'Sign Up',
                         style: const TextStyle(
