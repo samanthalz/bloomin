@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Bloomin App',
+      title: 'Bloom'n App',
       theme: ThemeData(
         appBarTheme: const AppBarTheme(backgroundColor: Color(0xFFB3F1C1)),
         primarySwatch: Colors.teal,
