@@ -24,14 +24,14 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 70, bottom: 50),
-              child:Center(
-                child: Image.asset(
+            child: Center(
+              child: Image.asset(
                 "assets/img/Bloomin_logo.png",
                 width: 350,
                 fit: BoxFit.contain,
-                ),
-              )
+              ),
             ),
+          ),
           const SizedBox(height: 18),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -127,7 +127,9 @@ class _LoginPageState extends State<LoginPage> {
                     width: 329,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/home');
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF9F7BFF),
                       ),
@@ -161,11 +163,12 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SignupPage(controller: widget.controller),
+                            builder:
+                                (context) =>
+                                    SignupPage(controller: widget.controller),
                           ),
                         );
                       },
-
 
                       child: Text(
                         'Sign Up',
