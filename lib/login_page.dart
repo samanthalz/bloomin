@@ -1,5 +1,7 @@
 import 'package:bloomin/signup_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginPage extends StatefulWidget {
   static const routeName = '/login';
@@ -51,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 50),
                 TextField(
                   controller: _emailController,
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.start,
                   style: const TextStyle(
                     color: Color(0xFF393939),
                     fontSize: 15,
@@ -59,11 +61,11 @@ class _LoginPageState extends State<LoginPage> {
                     fontWeight: FontWeight.w400,
                   ),
                   decoration: const InputDecoration(
-                    labelText: 'Email',
+                    hintText: 'Email',
                     filled: true,
                     fillColor: Color(0xFFE7DAF5),
                     labelStyle: TextStyle(
-                      color: Color(0xFF786B89),
+                      color: Color(0xFF29264C),
                       fontSize: 15,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
@@ -87,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 30),
                 TextField(
                   controller: _passController,
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.start,
                   style: const TextStyle(
                     color: Color(0xFF393939),
                     fontSize: 15,
@@ -95,11 +97,11 @@ class _LoginPageState extends State<LoginPage> {
                     fontWeight: FontWeight.w400,
                   ),
                   decoration: const InputDecoration(
-                    labelText: 'Password',
+                    hintText: 'Password',
                     filled: true,
                     fillColor: Color(0xFFE7DAF5),
                     labelStyle: TextStyle(
-                      color: Color(0xFF786B89),
+                      color: Color(0xFF29264C),
                       fontSize: 15,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
@@ -127,14 +129,63 @@ class _LoginPageState extends State<LoginPage> {
                     width: 329,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/home');
+                      onPressed: () async {
+                        final email = _emailController.text.trim();
+                        final password = _passController.text.trim();
+
+                        if (email.isEmpty || password.isEmpty) {
+                          Fluttertoast.showToast(
+                            msg: "Please fill in all fields",
+                          );
+                          return;
+                        }
+
+                        try {
+                          final auth = FirebaseAuth.instance;
+                          final UserCredential userCredential = await auth
+                              .signInWithEmailAndPassword(
+                                email: email,
+                                password: password,
+                              );
+
+                          final user = userCredential.user;
+
+                          if (user != null && user.emailVerified) {
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/home',
+                              (Route<dynamic> route) =>
+                                  false,
+                            );
+                          } else {
+                            Fluttertoast.showToast(
+                              msg:
+                                  "Email not verified. A verification link has been sent.",
+                            );
+                            await user?.sendEmailVerification();
+                          }
+                        } on FirebaseAuthException catch (e) {
+                          if (e.code == 'invalid-credential') {
+                            Fluttertoast.showToast(
+                              msg:
+                                  "Invalid email or password. Please try again.",
+                            );
+                          } else {
+                            Fluttertoast.showToast(
+                              msg: "Login failed: ${e.message}",
+                            );
+                          }
+                        } catch (e) {
+                          Fluttertoast.showToast(
+                            msg: "An error occurred. Please try again.",
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF9F7BFF),
                       ),
                       child: const Text(
-                        'Sign In',
+                        'Log In',
                         style: TextStyle(
                           color: Color(0xFFF0E6FD),
                           fontSize: 15,
