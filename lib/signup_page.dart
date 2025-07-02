@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'otp_page.dart';
+
 class SignupPage extends StatefulWidget {
   static const routeName = '/signup';
   final PageController controller;
@@ -20,7 +22,7 @@ class _SignupPageState extends State<SignupPage> {
   bool _obscurePass = true;
   bool _obscureRepass = true;
 
-  void _validateAndProceed() {
+  void _validateAndProceed(BuildContext context) {
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passController.text.trim();
@@ -51,7 +53,12 @@ class _SignupPageState extends State<SignupPage> {
     }
 
     Fluttertoast.showToast(msg: "Validation passed. Proceeding...");
-    // Add navigation or logic here
+
+    // ✅ Navigate to OTP page
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => OtpPage(email: email)),
+    );
   }
 
   @override
@@ -204,7 +211,9 @@ class _SignupPageState extends State<SignupPage> {
         width: 329,
         height: 56,
         child: ElevatedButton(
-          onPressed: _validateAndProceed,
+          onPressed: () {
+            _validateAndProceed(context);
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF9F7BFF),
           ),
