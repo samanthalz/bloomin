@@ -16,6 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+  bool _isFirstLoad = true; // ensure it runs once
 
   final List<Widget> _pages = [
     Center(child: Text('Home Page')),
@@ -25,6 +26,18 @@ class _HomePageState extends State<HomePage> {
     const ProfilePage(),
   ];
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_isFirstLoad) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map?;
+      if (args != null && args['selectedIndex'] != null) {
+        _currentIndex = args['selectedIndex'] as int;
+      }
+      _isFirstLoad = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
