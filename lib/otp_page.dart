@@ -1,31 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class OtpPage extends StatefulWidget {
+class OtpPage extends StatelessWidget {
   static const routeName = '/otp';
-
-  final String email; // Optional: if you want to show the email on screen
+  final String email;
 
   const OtpPage({super.key, required this.email});
 
-  @override
-  State<OtpPage> createState() => _OtpPageState();
-}
+  Future<void> _resendVerificationEmail() async {
+    final user = FirebaseAuth.instance.currentUser;
 
-class _OtpPageState extends State<OtpPage> {
-  final TextEditingController _otpController = TextEditingController();
-
-  void _verifyOtp() {
-    final otp = _otpController.text.trim();
-
-    if (otp.isEmpty || otp.length != 6) {
-      Fluttertoast.showToast(msg: "Please enter a 6-digit code");
-      return;
+    if (user != null && !user.emailVerified) {
+      await user.sendEmailVerification();
+      Fluttertoast.showToast(msg: "Verification email resent to $email");
+    } else {
+      Fluttertoast.showToast(msg: "Email already verified or user not found");
     }
+  }
 
-    // Simulate success (replace with actual verification logic)
-    Fluttertoast.showToast(msg: "OTP verified! Redirecting...");
-    // Navigator.pushReplacementNamed(context, '/home'); // Or wherever
+  void _goToLogin(BuildContext context) {
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
 
   @override
@@ -39,7 +34,7 @@ class _OtpPageState extends State<OtpPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Verify Email',
+                'Email Verification',
                 style: TextStyle(
                   fontSize: 26,
                   fontFamily: 'Poppins',
@@ -49,78 +44,54 @@ class _OtpPageState extends State<OtpPage> {
               ),
               const SizedBox(height: 20),
               Text(
-                'We’ve sent a 6-digit verification code to:',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Poppins',
-                  color: Colors.white70,
-                ),
+                "A verification link has been sent to:",
                 textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.white70),
               ),
               const SizedBox(height: 5),
               Text(
-                widget.email,
+                email,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
-                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 30),
-              TextField(
-                controller: _otpController,
-                maxLength: 6,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 20,
-                  letterSpacing: 6,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              const SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: _resendVerificationEmail,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF9F7BFF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  minimumSize: const Size.fromHeight(50),
                 ),
-                decoration: InputDecoration(
-                  counterText: '',
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintText: 'Enter OTP',
-                  hintStyle: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 18,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.white),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF9F7BFF)),
+                child: const Text(
+                  'Resend Verification Email',
+                  style: TextStyle(
+                    color: Color(0xFFF0E6FD),
+                    fontSize: 16,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              const SizedBox(height: 25),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _verifyOtp,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF9F7BFF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text(
-                    'Verify OTP',
-                    style: TextStyle(
-                      color: Color(0xFFF0E6FD),
-                      fontSize: 16,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w600,
-                    ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () => _goToLogin(context),
+                child: const Text(
+                  "Go to Login",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w500,
+                    decoration: TextDecoration.underline,
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

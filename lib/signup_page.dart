@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 import 'otp_page.dart';
 
@@ -22,7 +24,7 @@ class _SignupPageState extends State<SignupPage> {
   bool _obscurePass = true;
   bool _obscureRepass = true;
 
-  void _validateAndProceed(BuildContext context) {
+  Future<void> _validateAndProceed(BuildContext context) async {
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passController.text.trim();
@@ -52,13 +54,40 @@ class _SignupPageState extends State<SignupPage> {
       return;
     }
 
-    Fluttertoast.showToast(msg: "Validation passed. Proceeding...");
+    try {
+      final auth = FirebaseAuth.instance;
 
-    // ✅ Navigate to OTP page
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => OtpPage(email: email)),
-    );
+      final userCredential = await auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      final user = userCredential.user;
+
+      if (user != null) {
+        await user.sendEmailVerification();
+
+        final dbRef = FirebaseDatabase.instance
+            .ref()
+            .child('users')
+            .child(user.uid);
+        await dbRef.set({
+          'username': username,
+          'email': email,
+          'uid': user.uid,
+          'created_at': DateTime.now().toIso8601String(),
+        });
+
+        Fluttertoast.showToast(msg: "Verification email sent to $email");
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => OtpPage(email: email)),
+        );
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Signup failed: ${e.toString()}");
+    }
   }
 
   @override
