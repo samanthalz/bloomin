@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PeriodTrackerPage extends StatefulWidget {
   static const routeName = '/period';
@@ -69,6 +71,17 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
     if (_selectedStart == null || _selectedEnd == null) return;
 
     final newRange = DateTimeRange(start: _selectedStart!, end: _selectedEnd!);
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      // Handle not logged in
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You must be logged in to save your period log.'),
+        ),
+      );
+      return;
+    }
 
     // Save to local state
     setState(() {
@@ -77,7 +90,6 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
       }
 
       _loggedRanges.add(newRange);
-
       _isLogging = false;
       _isEditing = false;
       _selectedStart = null;
@@ -86,7 +98,7 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
     });
 
     try {
-      await _dbRef.child('period_logs').push().set({
+      await _dbRef.child('period_logs').child(user.uid).push().set({
         'start': newRange.start.toIso8601String(),
         'end': newRange.end.toIso8601String(),
       });
@@ -157,27 +169,63 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
   Widget _buildDateField(String label, DateTime? date) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Text(
-        '$label: ${date != null ? _formatDate(date) : '-'}',
-        style: const TextStyle(
-          fontSize: 16,
-          color: Colors.deepPurple,
-          fontWeight: FontWeight.w500,
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: '$label: ',
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.deepPurple,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            TextSpan(
+              text: date != null ? _formatDate(date) : '-',
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCycleInfo() {
-    if (_loggedRanges.isEmpty) return const SizedBox();
+  String _monthName(int month) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return months[month - 1];
+  }
 
-    final sorted = [..._loggedRanges]
-      ..sort((a, b) => a.start.compareTo(b.start));
-    final latest = sorted.last;
-    final periodLength = latest.end.difference(latest.start).inDays + 1;
-    String periodStatus =
-        (periodLength >= 3 && periodLength <= 7) ? "Normal" : "Abnormal";
-    Color periodColor = periodStatus == "Normal" ? Colors.green : Colors.red;
+  Widget _buildCycleInfo() {
+    String? periodStatus;
+    Color periodColor = Colors.grey;
+    int? periodLength;
+
+    if (_loggedRanges.isNotEmpty) {
+      final sorted = [..._loggedRanges]
+        ..sort((a, b) => a.start.compareTo(b.start));
+      final latest = sorted.last;
+      periodLength = latest.end.difference(latest.start).inDays + 1;
+      periodStatus =
+          (periodLength >= 3 && periodLength <= 7) ? "Normal" : "Abnormal";
+      periodColor = periodStatus == "Normal" ? Colors.green : Colors.red;
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -192,7 +240,7 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "My Cycles",
+              "Last Cycle Analysis",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -200,42 +248,50 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
               ),
             ),
             const SizedBox(height: 10),
-            Text.rich(
-              TextSpan(
-                children: [
-                  const TextSpan(
-                    text: 'Previous period duration: ',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  TextSpan(
-                    text: '$periodLength days',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+            if (periodLength != null) ...[
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'Previous period duration: ',
+                      style: TextStyle(fontSize: 16),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text.rich(
-              TextSpan(
-                children: [
-                  const TextSpan(
-                    text: 'Period Status: ',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  TextSpan(
-                    text: periodStatus,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: periodColor,
-                      fontWeight: FontWeight.w600,
+                    TextSpan(
+                      text: '$periodLength days',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              const SizedBox(height: 4),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'Period Status: ',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    TextSpan(
+                      text: periodStatus!,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: periodColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ] else ...[
+              const SizedBox(height: 8),
+              const Text(
+                'No period records found yet. Log your period to begin tracking your cycle.',
+                style: TextStyle(fontSize: 15, color: Colors.black54),
+              ),
+            ],
           ],
         ),
       ),
@@ -274,7 +330,62 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
                   (focusedDay) => setState(() => _focusedDay = focusedDay),
               availableCalendarFormats: const {CalendarFormat.month: 'Month'},
               calendarFormat: CalendarFormat.month,
+              headerStyle: HeaderStyle(
+                formatButtonVisible: false,
+                titleCentered: true,
+                leftChevronIcon: const Icon(
+                  Icons.chevron_left,
+                  color: Colors.deepPurple,
+                ),
+                rightChevronIcon: const Icon(
+                  Icons.chevron_right,
+                  color: Colors.deepPurple,
+                ),
+                titleTextFormatter:
+                    (date, locale) =>
+                        '${_monthName(date.month)} ${date.year}', // 👈 Custom format
+                titleTextStyle: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple,
+                ),
+              ),
               calendarBuilders: CalendarBuilders(
+                headerTitleBuilder: (context, day) {
+                  return GestureDetector(
+                    onTap: () async {
+                      final picked = await showMonthPicker(
+                        context: context,
+                        initialDate: _focusedDay,
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2100),
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          _focusedDay = picked;
+                        });
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${_monthName(day.month)} ${day.year}',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.deepPurple,
+                        ),
+                      ],
+                    ),
+                  );
+                },
                 defaultBuilder: (context, day, _) {
                   final isLogged = _isDayLogged(day);
                   return Container(
@@ -296,6 +407,7 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
                 },
               ),
             ),
+
             const SizedBox(height: 20),
             if (_isLogging)
               Padding(
