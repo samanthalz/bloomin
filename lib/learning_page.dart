@@ -138,6 +138,19 @@ class _LearningPageState extends State<LearningPage> {
                               vertical: 8,
                             ),
                             child: ListTile(
+                              leading:
+                                  article['urlToImage'] != null
+                                      ? Image.network(
+                                        article['urlToImage'],
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (_, __, ___) => const Icon(
+                                              Icons.image_not_supported,
+                                            ),
+                                      )
+                                      : const Icon(Icons.image),
                               title: Text(article['title'] ?? 'No Title'),
                               subtitle: Text(
                                 article['source']['name'] ?? 'Unknown',
