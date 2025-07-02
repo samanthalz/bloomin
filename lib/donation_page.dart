@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'enter_amount_page.dart';
-import 'package:bloomin/widgets/bottom_nav_bar.dart';
 
 class DonationPage extends StatefulWidget {
   static const routeName = '/donate';
@@ -13,6 +14,58 @@ class DonationPage extends StatefulWidget {
 
 class _DonationPageState extends State<DonationPage> {
   final ScrollController _scrollController = ScrollController();
+  final _database = FirebaseDatabase.instance.ref();
+  final _auth = FirebaseAuth.instance;
+
+  List<Map<String, dynamic>> _donations = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDonations();
+  }
+
+  Future<void> _fetchDonations() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    try {
+      final snapshot = await FirebaseDatabase.instance
+          .ref()
+          .child('donations/${user.uid}')
+          .get()
+          .timeout(const Duration(seconds: 10));
+
+      if (!mounted) return;
+
+      if (snapshot.exists) {
+        final Map data = snapshot.value as Map;
+        final List<Map<String, dynamic>> fetched = [];
+
+        data.forEach((key, value) {
+          fetched.add({
+            'id': key,
+            'amount': value['amount'],
+            'date': value['date'],
+          });
+        });
+
+        setState(() {
+          _donations = fetched;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _donations = [];
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Fetch error: $e');
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,36 +92,58 @@ class _DonationPageState extends State<DonationPage> {
             const Divider(color: Color(0xFFBBAACC), thickness: 1.2),
             const SizedBox(height: 10),
             Expanded(
-              child: Scrollbar(
-                controller: _scrollController,
-                thumbVisibility: true,
-                thickness: 6,
-                radius: const Radius.circular(10),
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemCount: 12, // More than 8 to show scrollability
-                  itemBuilder: (context, index) {
-                    return Card(
-                      color: const Color(0xFFE7DAF5),
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      child: ListTile(
-                        leading: const Icon(
-                          Icons.history,
-                          color: Color(0xFF735276),
+              child:
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _donations.isEmpty
+                      ? const Center(
+                        child: Text(
+                          "No donation history found.",
+                          style: TextStyle(fontSize: 16, color: Colors.black54),
                         ),
-                        title: Text(
-                          "Donation RM ${10 * (index + 1)}",
-                          style: const TextStyle(color: Color(0xFF29264C)),
-                        ),
-                        subtitle: const Text(
-                          "Date: 2024-06-30",
-                          style: TextStyle(color: Color(0xFF786B89)),
+                      )
+                      : Scrollbar(
+                        controller: _scrollController,
+                        thumbVisibility: true,
+                        thickness: 6,
+                        radius: const Radius.circular(10),
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: _donations.length,
+                          itemBuilder: (context, index) {
+                            final donation = _donations[index];
+                            final amount = donation['amount'];
+                            final date = DateTime.tryParse(donation['date']);
+                            final formattedDate =
+                                date != null
+                                    ? "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}"
+                                    : "Unknown Date";
+
+                            return Card(
+                              color: const Color(0xFFE7DAF5),
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              child: ListTile(
+                                leading: const Icon(
+                                  Icons.history,
+                                  color: Color(0xFF735276),
+                                ),
+                                title: Text(
+                                  "Donation RM $amount",
+                                  style: const TextStyle(
+                                    color: Color(0xFF29264C),
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  "Date: $formattedDate",
+                                  style: const TextStyle(
+                                    color: Color(0xFF786B89),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
             ),
             const SizedBox(height: 20),
             SizedBox(

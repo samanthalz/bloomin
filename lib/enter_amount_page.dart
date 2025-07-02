@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'payment_page.dart';
 
 class EnterAmountPage extends StatefulWidget {
@@ -11,6 +13,7 @@ class EnterAmountPage extends StatefulWidget {
 class _EnterAmountPageState extends State<EnterAmountPage> {
   final TextEditingController _amountController = TextEditingController();
   final double padCost = 4.50;
+  final List<double> quickAmounts = [10, 20, 50, 100, 150, 250];
 
   double get _calculatedPacks {
     final amount = double.tryParse(_amountController.text) ?? 0;
@@ -23,7 +26,34 @@ class _EnterAmountPageState extends State<EnterAmountPage> {
     });
   }
 
-  final List<double> quickAmounts = [10, 20, 50, 100, 150, 250];
+  Future<void> _saveDonationAndNavigate() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('User not logged in')));
+      return;
+    }
+
+    final amount = _amountController.text;
+    final timestamp = DateTime.now().toIso8601String();
+
+    try {
+      await FirebaseDatabase.instance.ref('donations/${user.uid}').push().set({
+        'amount': amount,
+        'date': timestamp,
+      });
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => PaymentPage(amount: amount)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error saving donation: $e')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,17 +157,7 @@ class _EnterAmountPageState extends State<EnterAmountPage> {
               child: ElevatedButton(
                 onPressed:
                     _amountController.text.isNotEmpty
-                        ? () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => PaymentPage(
-                                    amount: _amountController.text,
-                                  ),
-                            ),
-                          );
-                        }
+                        ? _saveDonationAndNavigate
                         : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF9F7BFF),
