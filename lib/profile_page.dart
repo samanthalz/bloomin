@@ -73,41 +73,6 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  Future<void> fetchUserDetails() async {
-    try {
-      await FirebaseAuth.instance.currentUser?.reload();
-      final refreshedUser = FirebaseAuth.instance.currentUser;
-
-      if (refreshedUser != null) {
-        final snapshot = await db.child('users/${refreshedUser.uid}').get();
-        final data = snapshot.value as Map?;
-
-        final currentEmail = refreshedUser.email;
-        final dbEmail = data?['email'];
-        final dbLastDispense = data?['lastDispense'];
-
-        if (currentEmail != null && dbEmail != currentEmail) {
-          await db.child('users/${refreshedUser.uid}').update({
-            'email': currentEmail,
-          });
-        }
-
-        if (!_mockScanWritten && dbLastDispense == null) {
-          _mockScanWritten = true;
-          await updateLastDispense();
-        }
-
-        setState(() {
-          username = data?['username'] ?? 'N/A';
-          email = currentEmail ?? 'N/A';
-          lastDispenseMillis = dbLastDispense;
-        });
-      }
-    } catch (e) {
-      debugPrint("Fetch error: $e");
-    }
-  }
-
   Future<void> updateLastDispense() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -121,7 +86,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildLabelRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -187,8 +152,8 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: 4),
         Text(
           "${hours.toString().padLeft(2, '0')}h "
-          "${minutes.toString().padLeft(2, '0')}m "
-          "${seconds.toString().padLeft(2, '0')}s",
+              "${minutes.toString().padLeft(2, '0')}m "
+              "${seconds.toString().padLeft(2, '0')}s",
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -204,87 +169,121 @@ class _ProfilePageState extends State<ProfilePage> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF4D7), // pastel yellow
+      backgroundColor: const Color(0xFFFFF4D7),
       appBar: AppBar(
         title: const Text(
           "Profile",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-
         centerTitle: true,
-        backgroundColor: const Color(0xFFF89BA3), // medium pink
+        backgroundColor: const Color(0xFFF89BA3),
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 30),
-            Card(
-              elevation: 4,
-              color: const Color(0xFFFAD3D8), // pale pink card
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 30,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 20),
+
+              // Profile card
+              Card(
+                elevation: 4,
+                color: const Color(0xFFFAD3D8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: Column(
-                  children: [
-                    _buildLabelRow("Username", username ?? ''),
-                    _buildLabelRow("Email", email ?? ''),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 24,
+                  ),
+                  child: Column(
+                    children: [
+                      _buildLabelRow("Username", username ?? ''),
+                      _buildLabelRow("Email", email ?? ''),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 40),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
+
+              const SizedBox(height: 24),
+
+              // Edit Button
+              ElevatedButton.icon(
                 onPressed: () async {
                   await Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const EditProfilePage()),
                   );
-                  fetchUserDetails();
                 },
                 icon: const Icon(Icons.edit),
-                label: const Text(
-                  "Edit Details",
-                  style: TextStyle(fontSize: 16),
-                ),
+                label: const Text("Edit Details"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF85A0E8), // light blue
+                  backgroundColor: const Color(0xFF85A0E8),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              "Your QR Code",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
+
+              const SizedBox(height: 24),
+
+              const Text(
+                "Your QR Code",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
-            const SizedBox(height: 10),
-            if (uid != null)
-              QrImageView(
-                data: uid,
-                version: QrVersions.auto,
-                size: 160.0,
-                backgroundColor: Colors.white,
+
+              const SizedBox(height: 10),
+
+              if (uid != null)
+                Center(
+                  child: QrImageView(
+                    data: uid,
+                    version: QrVersions.auto,
+                    size: 140.0,
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+
+              const SizedBox(height: 16),
+              _buildCooldownTimer(),
+
+              const SizedBox(height: 30),
+
+              // Logout button
+              ElevatedButton.icon(
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  if (context.mounted) {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/login',
+                          (route) => false,
+                    );
+                  }
+                },
+                icon: const Icon(Icons.logout),
+                label: const Text("Log Out"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
-            const SizedBox(height: 16),
-            _buildCooldownTimer(),
-          ],
+            ],
+          ),
         ),
       ),
     );

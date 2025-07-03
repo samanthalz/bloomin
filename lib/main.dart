@@ -8,6 +8,8 @@ import 'package:bloomin/profile_page.dart.';
 import 'package:bloomin/period_tracker_page.dart.';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'forgot_password_page.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -38,6 +40,7 @@ class MyApp extends StatelessWidget {
         LearningPage.routeName: (context) => const LearningPage(),
         DonationPage.routeName: (context) => const DonationPage(),
         PeriodTrackerPage.routeName: (context) => const PeriodTrackerPage(),
+        ForgotPasswordPage.routeName: (context) => const ForgotPasswordPage(),
       },
     );
   }

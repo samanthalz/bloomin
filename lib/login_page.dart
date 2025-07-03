@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'forgot_password_page.dart';
+
 class LoginPage extends StatefulWidget {
   static const routeName = '/login';
   final PageController controller;
@@ -16,11 +18,12 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF735276),
+      backgroundColor: const Color(0xFF735276),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -38,7 +41,6 @@ class _LoginPageState extends State<LoginPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50),
             child: Column(
-              textDirection: TextDirection.ltr,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
@@ -89,6 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 30),
                 TextField(
                   controller: _passController,
+                  obscureText: _obscurePassword,
                   textAlign: TextAlign.start,
                   style: const TextStyle(
                     color: Color(0xFF393939),
@@ -96,29 +99,42 @@ class _LoginPageState extends State<LoginPage> {
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w400,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Password',
                     filled: true,
-                    fillColor: Color(0xFFE7DAF5),
-                    labelStyle: TextStyle(
+                    fillColor: const Color(0xFFE7DAF5),
+                    labelStyle: const TextStyle(
                       color: Color(0xFF29264C),
                       fontSize: 15,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
                     ),
-                    enabledBorder: OutlineInputBorder(
+                    enabledBorder: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                       borderSide: BorderSide(
                         width: 1,
                         color: Color(0xFF837E93),
                       ),
                     ),
-                    focusedBorder: OutlineInputBorder(
+                    focusedBorder: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                       borderSide: BorderSide(
                         width: 1,
                         color: Color(0xFF9F7BFF),
                       ),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: const Color(0xFF735276),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
                     ),
                   ),
                 ),
@@ -144,9 +160,9 @@ class _LoginPageState extends State<LoginPage> {
                           final auth = FirebaseAuth.instance;
                           final UserCredential userCredential = await auth
                               .signInWithEmailAndPassword(
-                                email: email,
-                                password: password,
-                              );
+                            email: email,
+                            password: password,
+                          );
 
                           final user = userCredential.user;
 
@@ -154,13 +170,12 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.pushNamedAndRemoveUntil(
                               context,
                               '/home',
-                              (Route<dynamic> route) =>
-                                  false,
+                                  (Route<dynamic> route) => false,
                             );
                           } else {
                             Fluttertoast.showToast(
                               msg:
-                                  "Email not verified. A verification link has been sent.",
+                              "Email not verified. A verification link has been sent.",
                             );
                             await user?.sendEmailVerification();
                           }
@@ -168,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                           if (e.code == 'invalid-credential') {
                             Fluttertoast.showToast(
                               msg:
-                                  "Invalid email or password. Please try again.",
+                              "Invalid email or password. Please try again.",
                             );
                           } else {
                             Fluttertoast.showToast(
@@ -214,16 +229,14 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    SignupPage(controller: widget.controller),
+                            builder: (context) =>
+                                SignupPage(controller: widget.controller),
                           ),
                         );
                       },
-
-                      child: Text(
+                      child: const Text(
                         'Sign Up',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Color(0xFF846BD6),
                           fontSize: 15,
                           fontFamily: 'Poppins',
@@ -234,13 +247,18 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 const SizedBox(height: 15),
-                const Text(
-                  'Forget Password?',
-                  style: TextStyle(
-                    color: Color(0xFF846BD6),
-                    fontSize: 15,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, ForgotPasswordPage.routeName);
+                  },
+                  child: const Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      color: Color(0xFF846BD6),
+                      fontSize: 15,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
