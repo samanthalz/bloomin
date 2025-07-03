@@ -174,9 +174,9 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
           children: [
             TextSpan(
               text: '$label: ',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
-                color: Colors.deepPurple,
+                color: Colors.pink[900],
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -233,18 +233,19 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.deepPurple),
+          border: Border.all(color: Colors.black54),
           borderRadius: BorderRadius.circular(12),
+          color: Color(0xFFFDE1EE),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               "Last Cycle Analysis",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
+                color: Colors.pinkAccent[700],
               ),
             ),
             const SizedBox(height: 10),
@@ -301,10 +302,15 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFF4D7), // pastel yellow
       appBar: AppBar(
-        title: const Text('Period Tracker'),
+        title: const Text(
+          'Period Tracker',
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.purple[100],
+        backgroundColor: const Color(0xFFF87E86), // soft red-pink
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -333,21 +339,21 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
               headerStyle: HeaderStyle(
                 formatButtonVisible: false,
                 titleCentered: true,
-                leftChevronIcon: const Icon(
+                leftChevronIcon: Icon(
                   Icons.chevron_left,
-                  color: Colors.deepPurple,
+                  color: Colors.pink[900],
                 ),
-                rightChevronIcon: const Icon(
+                rightChevronIcon: Icon(
                   Icons.chevron_right,
-                  color: Colors.deepPurple,
+                  color: Colors.pink[900],
                 ),
                 titleTextFormatter:
                     (date, locale) =>
                         '${_monthName(date.month)} ${date.year}', // 👈 Custom format
-                titleTextStyle: const TextStyle(
+                titleTextStyle: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
+                  color: Colors.pink[900],
                 ),
               ),
               calendarBuilders: CalendarBuilders(
@@ -371,17 +377,14 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
                       children: [
                         Text(
                           '${_monthName(day.month)} ${day.year}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.deepPurple,
+                            color: Colors.pink[900],
                           ),
                         ),
                         const SizedBox(width: 4),
-                        const Icon(
-                          Icons.arrow_drop_down,
-                          color: Colors.deepPurple,
-                        ),
+                        Icon(Icons.arrow_drop_down, color: Colors.pink[900]),
                       ],
                     ),
                   );
@@ -391,14 +394,14 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
                   return Container(
                     margin: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: isLogged ? Colors.pink[100] : null,
+                      color: isLogged ? const Color(0xFFF9B5C6) : null,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       '${day.day}',
                       style: TextStyle(
-                        color: isLogged ? Colors.pink[800] : Colors.black,
+                        color: isLogged ? Colors.pink[900] : Colors.black,
                         fontWeight:
                             isLogged ? FontWeight.bold : FontWeight.normal,
                       ),
@@ -415,19 +418,21 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.deepPurple),
-                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFFFDE1EE),
+                    border: Border.all(color: Colors.black54),
+                    borderRadius: BorderRadius.circular(100),
                   ),
+
                   child: Column(
                     children: [
                       Text(
                         _isEditing
                             ? 'Edit Period Range'
                             : 'Select Period Range',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
+                          color: Colors.pink[600],
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -446,7 +451,7 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
                               backgroundColor:
                                   (_selectedStart != null &&
                                           _selectedEnd != null)
-                                      ? Colors.deepPurple[400]
+                                      ? const Color(0xFFF87E86)
                                       : Colors.grey,
                               foregroundColor:
                                   (_selectedStart != null &&
@@ -502,7 +507,7 @@ class _PeriodTrackerPageState extends State<PeriodTrackerPage> {
                   icon: const Icon(Icons.add),
                   label: const Text('Log Period'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
+                    backgroundColor: const Color(0xFFF87E86),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 30,

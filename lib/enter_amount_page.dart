@@ -56,11 +56,18 @@ class _EnterAmountPageState extends State<EnterAmountPage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFF4D7), // pastel yellow
       appBar: AppBar(
-        title: const Text("Enter Donation Amount"),
-        backgroundColor: const Color(0xFF9F7BFF),
+        title: const Text(
+          "Enter Donation Amount",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        backgroundColor: const Color(0xFFF87E86), // soft red-pink
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -69,10 +76,14 @@ class _EnterAmountPageState extends State<EnterAmountPage> {
             TextField(
               controller: _amountController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: "Donation Amount",
                 prefixText: "RM ",
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.white,
               ),
               onChanged: (_) => setState(() {}),
             ),
@@ -87,8 +98,8 @@ class _EnterAmountPageState extends State<EnterAmountPage> {
                       height: 45,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF9F7BFF),
-                          foregroundColor: Colors.white,
+                          backgroundColor: const Color(0xFFF8B3B3), // soft pink
+                          foregroundColor: Colors.pinkAccent[700],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -104,9 +115,9 @@ class _EnterAmountPageState extends State<EnterAmountPage> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3EBFF),
-                border: Border.all(color: Color(0xFF9F7BFF)),
+                color: const Color(0xFFFAD3D8), // light pink
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Color(0xFFF89BA3)), // pink border
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,13 +127,13 @@ class _EnterAmountPageState extends State<EnterAmountPage> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: Colors.deepPurple[700],
+                      color: Colors.pinkAccent[700],
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     "• 1 packet of sanitary pad costs RM ${padCost.toStringAsFixed(2)}.",
-                    style: const TextStyle(fontSize: 14),
+                    style: const TextStyle(fontSize: 14, color: Colors.black87),
                   ),
                   const SizedBox(height: 4),
                   Text.rich(
@@ -160,7 +171,7 @@ class _EnterAmountPageState extends State<EnterAmountPage> {
                         ? _saveDonationAndNavigate
                         : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF9F7BFF),
+                  backgroundColor: const Color(0xFFF87E86), // pink CTA
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

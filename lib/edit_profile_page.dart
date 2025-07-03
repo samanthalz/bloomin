@@ -193,13 +193,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    final saveColor = _hasChanged ? Colors.deepPurple : Colors.grey;
+    final saveColor = _hasChanged ? const Color(0xFF85A0E8) : Colors.grey;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFFF4D7), // pastel yellow
       appBar: AppBar(
-        title: const Text("Edit Profile"),
-        backgroundColor: Colors.purple[100],
+        title: const Text(
+          "Edit Profile",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xFFF89BA3), // medium pink
+        foregroundColor: Colors.white,
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -209,7 +216,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
             children: [
               TextFormField(
                 controller: _usernameController,
-                decoration: const InputDecoration(labelText: 'Username'),
+                decoration: const InputDecoration(
+                  labelText: 'Username',
+                  labelStyle: TextStyle(color: Color(0xFF5D2E46)),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFF87E86)), // pink
+                  ),
+                ),
                 validator:
                     (val) =>
                         val == null || val.isEmpty ? "Enter username" : null,
@@ -217,7 +230,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  labelStyle: TextStyle(color: Color(0xFF5D2E46)),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFF87E86)),
+                  ),
+                ),
                 validator:
                     (val) =>
                         val == null || !val.contains('@')
@@ -233,6 +252,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     backgroundColor: saveColor,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   child:
                       _updating
@@ -241,15 +263,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
               const SizedBox(height: 20),
-              OutlinedButton.icon(
+              ElevatedButton.icon(
                 onPressed: _sendResetPassword,
-                icon: const Icon(Icons.lock_reset, color: Colors.deepPurple),
+                icon: const Icon(
+                  Icons.lock_reset,
+                  color: Color(0xFF5D2E46),
+                ), // deeper pink
                 label: const Text(
-                  "Change Password",
-                  style: TextStyle(color: Colors.deepPurple),
+                  "Forgot Password",
+                  style: TextStyle(
+                    color: Color(0xFF5D2E46), // plum/dark text for contrast
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.deepPurple),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFF8B4BA), // soft pink
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 24,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
                 ),
               ),
             ],

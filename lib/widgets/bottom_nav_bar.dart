@@ -5,18 +5,19 @@ class BottomNavBar extends StatelessWidget {
   final ValueChanged<int> onTap;
 
   const BottomNavBar({
-    Key? key,
+    super.key,
     required this.currentIndex,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
+      backgroundColor: const Color(0xFFFDE2E4),
       currentIndex: currentIndex,
-      selectedItemColor: Colors.deepPurple,
-      unselectedItemColor: Colors.grey,
+      selectedItemColor: const Color(0xFFEC4C77),
+      unselectedItemColor: const Color(0xFF344055),
       onTap: onTap,
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),

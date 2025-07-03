@@ -70,11 +70,15 @@ class _DonationPageState extends State<DonationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFFF4D7), // pastel yellow
       appBar: AppBar(
-        backgroundColor: const Color(0xFFC7C1ED),
-        title: const Text("Donate"),
+        backgroundColor: const Color(0xFFF89BA3), // pink
+        title: const Text(
+          "Donate",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
@@ -86,7 +90,7 @@ class _DonationPageState extends State<DonationPage> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: Color(0xFF5B4E6E), // dark pastel purple
               ),
             ),
             const Divider(color: Color(0xFFBBAACC), thickness: 1.2),
@@ -120,17 +124,18 @@ class _DonationPageState extends State<DonationPage> {
                                     : "Unknown Date";
 
                             return Card(
-                              color: const Color(0xFFE7DAF5),
-                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              color: const Color(0xFFF8CCD0), // light pink
+                              margin: const EdgeInsets.symmetric(vertical: 6),
                               child: ListTile(
                                 leading: const Icon(
                                   Icons.history,
-                                  color: Color(0xFF735276),
+                                  color: Color(0xFF5B4E6E),
                                 ),
                                 title: Text(
                                   "Donation RM $amount",
                                   style: const TextStyle(
                                     color: Color(0xFF29264C),
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 subtitle: Text(
@@ -157,10 +162,11 @@ class _DonationPageState extends State<DonationPage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF9F7BFF),
+                  backgroundColor: const Color(0xFFF87E86), // dark pink
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  elevation: 2,
                 ),
                 child: const Text(
                   "Donate Now",
@@ -172,6 +178,7 @@ class _DonationPageState extends State<DonationPage> {
                 ),
               ),
             ),
+            const SizedBox(height: 30)
           ],
         ),
       ),

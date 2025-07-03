@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'donation_page.dart';
 
 class PaymentPage extends StatelessWidget {
   final String amount;
@@ -8,9 +7,15 @@ class PaymentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFF4D7), // pastel yellow
       appBar: AppBar(
-        title: const Text("Payment"),
-        backgroundColor: const Color(0xFF9F7BFF),
+        title: const Text(
+          "Payment",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        backgroundColor: const Color(0xFFF87E86), // soft red-pink
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -23,6 +28,7 @@ class PaymentPage extends StatelessWidget {
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Poppins',
+                color: Color(0xFF333333),
               ),
               textAlign: TextAlign.center,
             ),
@@ -30,6 +36,7 @@ class PaymentPage extends StatelessWidget {
             Flexible(
               fit: FlexFit.loose,
               child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
                 child: Image.asset(
                   'assets/img/tng_qr.jpg',
                   fit: BoxFit.contain,
@@ -37,22 +44,22 @@ class PaymentPage extends StatelessWidget {
                 ),
               ),
             ),
-
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
               height: 60,
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
                 onPressed: () {
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     '/home',
-                        (route) => false,
+                    (route) => false,
                     arguments: {'selectedIndex': 2},
                   );
                 },
+                label: const Text("Back to Donation History"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF9F7BFF),
+                  backgroundColor: const Color(0xFFF87E86),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -63,7 +70,6 @@ class PaymentPage extends StatelessWidget {
                     fontFamily: 'Poppins',
                   ),
                 ),
-                child: const Text("Back to Donation History"),
               ),
             ),
           ],

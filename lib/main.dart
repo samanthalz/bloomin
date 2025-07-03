@@ -24,10 +24,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Bloomin App',
-      theme: ThemeData(
-        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFFB3F1C1)),
-        primarySwatch: Colors.teal,
-      ),
 
       // 👇 Set default route to login
       initialRoute: LoginPage.routeName,

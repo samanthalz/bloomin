@@ -77,12 +77,18 @@ class _LearningPageState extends State<LearningPage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFF4D7), // pastel yellow
       appBar: AppBar(
-        title: const Text("Learning"),
+        title: const Text(
+          "Learning",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.purple[100],
+        backgroundColor: const Color(0xFFF89BA3), // pink
+        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
@@ -92,27 +98,28 @@ class _LearningPageState extends State<LearningPage> {
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: "Search articles...",
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon:
-                    _searchController.text.isNotEmpty
-                        ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            setState(() {
-                              searchText = '';
-                              _searchController.clear();
-                            });
-                          },
-                        )
-                        : null,
+                prefixIcon: const Icon(Icons.search, color: Color(0xFF5D2E46)),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    setState(() {
+                      searchText = '';
+                      _searchController.clear();
+                    });
+                  },
+                )
+                    : null,
+                filled: true,
+                fillColor: const Color(0xFFF6D9D9),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
               ),
-              onChanged: (val) {
-                setState(() => searchText = val);
-              },
+              onChanged: (val) => setState(() => searchText = val),
             ),
+
           ),
           Expanded(
             child:
@@ -133,27 +140,43 @@ class _LearningPageState extends State<LearningPage> {
                         itemBuilder: (context, index) {
                           final article = filteredArticles[index];
                           return Card(
+                            color: const Color(0xFFE3F2FD),
                             margin: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 8,
                             ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             child: ListTile(
                               leading:
                                   article['urlToImage'] != null
-                                      ? Image.network(
-                                        article['urlToImage'],
-                                        width: 60,
-                                        height: 60,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (_, __, ___) => const Icon(
-                                              Icons.image_not_supported,
-                                            ),
+                                      ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          article['urlToImage'],
+                                          width: 60,
+                                          height: 60,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (_, __, ___) => const Icon(
+                                                Icons.image_not_supported,
+                                              ),
+                                        ),
                                       )
                                       : const Icon(Icons.image),
-                              title: Text(article['title'] ?? 'No Title'),
+                              title: Text(
+                                article['title'] ?? 'No Title',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF333333),
+                                ),
+                              ),
                               subtitle: Text(
                                 article['source']['name'] ?? 'Unknown',
+                                style: const TextStyle(
+                                  color: Color(0xFF5D2E46),
+                                ),
                               ),
                               trailing: const Icon(Icons.arrow_forward_ios),
                               onTap: () {
@@ -179,7 +202,21 @@ class _LearningPageState extends State<LearningPage> {
               padding: const EdgeInsets.all(12.0),
               child: ElevatedButton(
                 onPressed: fetchArticles,
-                child: const Text("Load More"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF85A0E8), // light blue
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  "Load More",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ),
         ],
