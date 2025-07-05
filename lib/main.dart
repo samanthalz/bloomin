@@ -4,11 +4,12 @@ import 'package:bloomin/signup_page.dart';
 import 'package:bloomin/home_page.dart';
 import 'package:bloomin/donation_page.dart';
 import 'package:bloomin/learning_page.dart';
-import 'package:bloomin/profile_page.dart.';
-import 'package:bloomin/period_tracker_page.dart.';
+import 'package:bloomin/profile_page.dart';
+import 'package:bloomin/period_tracker_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:bloomin/forgot_password_page.dart';
 
-import 'forgot_password_page.dart';
+import 'auth_check_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,10 +28,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Bloomin App',
 
-      // 👇 Set default route to login
-      initialRoute: LoginPage.routeName,
+      home: AuthCheckPage(controller: pageController),
 
-      // 👇 Register all your named routes here
       routes: {
         LoginPage.routeName: (context) => LoginPage(controller: pageController),
         SignupPage.routeName:
