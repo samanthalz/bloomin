@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+
+import 'video_player_page.dart';
 import 'webview_page.dart';
+import 'quiz_page.dart';
+import 'quiz_data.dart';
 
 class LearningPage extends StatefulWidget {
   static const routeName = '/learning';
@@ -12,106 +15,132 @@ class LearningPage extends StatefulWidget {
   State<LearningPage> createState() => _LearningPageState();
 }
 
-class _LearningPageState extends State<LearningPage> with SingleTickerProviderStateMixin {
+class _LearningPageState extends State<LearningPage>
+    with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  final ScrollController _scrollController = ScrollController();
-  final TextEditingController _searchController = TextEditingController();
+  int _currentTab = 0;
+  final TextEditingController _search = TextEditingController();
+  final ScrollController _articleCtrl = ScrollController();
+  final ScrollController _videoCtrl = ScrollController();
 
   final String newsKey = '04d6fa829c0242c0a0bee11470464327';
-  final String ytKey = 'AIzaSyAXZJWjhx6yzmzhK_Ie8ZQUvp8PP6Q_Rzg'; // <-- insert your key here
+  final String ytKey = 'AIzaSyAXZJWjhx6yzmzhK_Ie8ZQUvp8PP6Q_Rzg';
 
-  final String baseQuery = 'menstrual health OR period tips OR menstruation OR menstrual hygiene '
+  final String baseQuery =
+      'menstrual health OR period tips OR menstruation OR menstrual hygiene '
       'OR menstrual education OR women period OR period pain OR hormonal health';
 
   List articles = [];
   List videos = [];
 
   int articlePage = 1;
-  String nextVideoPageToken = '';
+  String? nextVideoToken = '';
   bool isNewsLoading = true;
   bool isVideoLoading = true;
-  bool showLoadMore = false;
-
+  bool moreNewsLoading = false;
+  bool moreVideoLoading = false;
   String searchText = '';
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      if (mounted) setState(() => _currentTab = _tabController.index);
+    });
+
     fetchArticles();
     fetchVideos();
-    _scrollController.addListener(_onScroll);
+    _articleCtrl.addListener(_checkArticleScroll);
+    _videoCtrl.addListener(_checkVideoScroll);
   }
 
-  Future<void> fetchArticles() async {
+  Future<void> fetchArticles({bool loadMore = false}) async {
+    if (loadMore) setState(() => moreNewsLoading = true);
     final url =
         'https://newsapi.org/v2/everything?q=${Uri.encodeComponent(baseQuery)}'
         '&language=en&pageSize=10&page=$articlePage&sortBy=publishedAt&apiKey=$newsKey';
 
     try {
       final res = await http.get(Uri.parse(url));
-      final data = json.decode(res.body);
+      final data = jsonDecode(res.body);
       setState(() {
         articles.addAll(data['articles']);
-        isNewsLoading = false;
         articlePage++;
       });
     } catch (e) {
-      setState(() => isNewsLoading = false);
-      debugPrint('News error: $e');
+      debugPrint('News fetch error: $e');
+    } finally {
+      setState(() {
+        isNewsLoading = false;
+        moreNewsLoading = false;
+      });
     }
   }
 
-  Future<void> fetchVideos() async {
-    final url = 'https://www.googleapis.com/youtube/v3/search?part=snippet'
+  Future<void> fetchVideos({bool loadMore = false}) async {
+    if (loadMore && (nextVideoToken == null || nextVideoToken!.isEmpty)) return;
+    if (loadMore) setState(() => moreVideoLoading = true);
+
+    final tok = loadMore && nextVideoToken != null ? '&pageToken=$nextVideoToken' : '';
+    final url =
+        'https://www.googleapis.com/youtube/v3/search?part=snippet'
         '&q=${Uri.encodeComponent(baseQuery)}'
-        '&type=video&maxResults=10&pageToken=$nextVideoPageToken&key=$ytKey';
+        '&type=video&maxResults=10$tok&key=$ytKey';
 
     try {
       final res = await http.get(Uri.parse(url));
-      final data = json.decode(res.body);
+      final data = jsonDecode(res.body);
       setState(() {
         videos.addAll(data['items']);
-        nextVideoPageToken = data['nextPageToken'] ?? '';
-        isVideoLoading = false;
+        nextVideoToken = data['nextPageToken'] ?? '';
       });
     } catch (e) {
-      setState(() => isVideoLoading = false);
-      debugPrint('YouTube error: $e');
+      debugPrint('YouTube fetch error: $e');
+    } finally {
+      setState(() {
+        isVideoLoading = false;
+        moreVideoLoading = false;
+      });
+    }
+  }
+
+  void _checkArticleScroll() {
+    if (_articleCtrl.position.pixels >=
+        _articleCtrl.position.maxScrollExtent - 200 &&
+        !moreNewsLoading) {
+      fetchArticles(loadMore: true);
+    }
+  }
+
+  void _checkVideoScroll() {
+    if (_videoCtrl.position.pixels >=
+        _videoCtrl.position.maxScrollExtent - 200 &&
+        !moreVideoLoading) {
+      fetchVideos(loadMore: true);
     }
   }
 
   List get filteredArticles {
     if (searchText.isEmpty) return articles;
-    return articles.where((article) {
-      final title = (article['title'] ?? '').toLowerCase();
-      final desc = (article['description'] ?? '').toLowerCase();
-      return title.contains(searchText.toLowerCase()) || desc.contains(searchText.toLowerCase());
+    return articles.where((a) {
+      final title = (a['title'] ?? '').toLowerCase();
+      final desc = (a['description'] ?? '').toLowerCase();
+      return title.contains(searchText.toLowerCase()) ||
+          desc.contains(searchText.toLowerCase());
     }).toList();
   }
 
   List get filteredVideos {
     if (searchText.isEmpty) return videos;
-    return videos.where((item) {
-      final title = (item['snippet']['title'] ?? '').toLowerCase();
+    return videos.where((v) {
+      final title = (v['snippet']['title'] ?? '').toLowerCase();
       return title.contains(searchText.toLowerCase());
     }).toList();
   }
 
-  void _onScroll() {
-    if (_tabController.index == 0) {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-        setState(() => showLoadMore = true);
-      } else {
-        setState(() => showLoadMore = false);
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final isArticleTab = _tabController.index == 0;
-
     return Scaffold(
       backgroundColor: const Color(0xFFFFF4D7),
       appBar: AppBar(
@@ -121,216 +150,207 @@ class _LearningPageState extends State<LearningPage> with SingleTickerProviderSt
         foregroundColor: Colors.white,
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [Tab(text: 'Articles'), Tab(text: 'Video Courses')],
+          tabs: const [
+            Tab(text: 'Articles'),
+            Tab(text: 'Video Courses'),
+            Tab(text: 'Quiz'),
+          ],
           labelColor: Colors.white,
-          indicatorColor: Colors.white,
         ),
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: isArticleTab ? 'Search articles...' : 'Search videos...',
-                prefixIcon: const Icon(Icons.search, color: Color(0xFF5D2E46)),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    setState(() {
+          if (_currentTab != 2)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: TextField(
+                controller: _search,
+                decoration: InputDecoration(
+                  hintText: _currentTab == 0
+                      ? 'Search articles...'
+                      : 'Search videos...',
+                  prefixIcon: const Icon(Icons.search, color: Color(0xFF5D2E46)),
+                  suffixIcon: _search.text.isNotEmpty
+                      ? IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () => setState(() {
                       searchText = '';
-                      _searchController.clear();
-                    });
-                  },
-                )
-                    : null,
-                filled: true,
-                fillColor: const Color(0xFFF6D9D9),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+                      _search.clear();
+                    }),
+                  )
+                      : null,
+                  filled: true,
+                  fillColor: const Color(0xFFF6D9D9),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
+                onChanged: (v) => setState(() => searchText = v),
               ),
-              onChanged: (val) => setState(() => searchText = val),
             ),
-          ),
           Expanded(
             child: TabBarView(
               controller: _tabController,
+              physics: const NeverScrollableScrollPhysics(),
               children: [
-                isNewsLoading ? const Center(child: CircularProgressIndicator()) : _buildArticlesList(),
-                isVideoLoading ? const Center(child: CircularProgressIndicator()) : _buildVideosList(),
+                isNewsLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : RefreshIndicator(
+                  onRefresh: () async {
+                    articles.clear();
+                    articlePage = 1;
+                    await fetchArticles();
+                  },
+                  child: ListView.builder(
+                    controller: _articleCtrl,
+                    itemCount: filteredArticles.length + (moreNewsLoading ? 1 : 0),
+                    itemBuilder: (_, i) {
+                      if (i == filteredArticles.length) {
+                        return const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      final a = filteredArticles[i];
+                      return _ArticleTile(article: a);
+                    },
+                  ),
+                ),
+                isVideoLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                  controller: _videoCtrl,
+                  itemCount: filteredVideos.length + (moreVideoLoading ? 1 : 0),
+                  itemBuilder: (_, i) {
+                    if (i == filteredVideos.length) {
+                      return const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    final v = filteredVideos[i];
+                    return _VideoTile(video: v);
+                  },
+                ),
+                ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: quizList.length,
+                  itemBuilder: (_, i) {
+                    final quiz = quizList[i];
+                    return Card(
+                      color: const Color(0xFFE1F5FE),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      child: ListTile(
+                        leading: CircleAvatar(child: Text('${i + 1}')),
+                        title: Text(quiz.title),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => QuizPage(quiz: quiz),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ),
-          if (isArticleTab && showLoadMore && !isNewsLoading)
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: ElevatedButton(
-                onPressed: fetchArticles,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF85A0E8),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text('Load More', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ),
-          if (!isArticleTab && nextVideoPageToken.isNotEmpty && !isVideoLoading)
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: ElevatedButton(
-                onPressed: fetchVideos,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF85A0E8),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text('Load More Videos', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ),
         ],
       ),
     );
   }
 
-  Widget _buildArticlesList() {
-    return RefreshIndicator(
-      onRefresh: () async {
-        setState(() {
-          articles.clear();
-          articlePage = 1;
-          isNewsLoading = true;
-        });
-        await fetchArticles();
-      },
-      child: ListView.builder(
-        controller: _scrollController,
-        itemCount: filteredArticles.length,
-        itemBuilder: (_, i) {
-          final a = filteredArticles[i];
-          return Card(
-            color: const Color(0xFFE3F2FD),
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: ListTile(
-              leading: a['urlToImage'] != null
-                  ? ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  a['urlToImage'],
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported),
-                ),
-              )
-                  : const Icon(Icons.image),
-              title: Text(a['title'] ?? 'No Title',
-                  style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF333333))),
-              subtitle: Text(a['source']['name'] ?? 'Unknown',
-                  style: const TextStyle(color: Color(0xFF5D2E46))),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => WebViewPage(url: a['url'], title: a['title'])),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildVideosList() {
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: filteredVideos.length,
-      itemBuilder: (_, i) {
-        final v = filteredVideos[i];
-        final id = v['id']['videoId'];
-        final snippet = v['snippet'];
-        return Card(
-          color: const Color(0xFFF6E3F7),
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: ListTile(
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                snippet['thumbnails']['default']['url'],
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-              ),
-            ),
-            title: Text(snippet['title'],
-                style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF333333))),
-            subtitle: Text(snippet['channelTitle'],
-                style: const TextStyle(color: Color(0xFF5D2E46))),
-            trailing: const Icon(Icons.play_circle),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => _VideoPlayerPage(videoId: id)),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   void dispose() {
+    _articleCtrl.dispose();
+    _videoCtrl.dispose();
     _tabController.dispose();
-    _scrollController.dispose();
-    _searchController.dispose();
+    _search.dispose();
     super.dispose();
   }
 }
 
-class _VideoPlayerPage extends StatefulWidget {
-  final String videoId;
-  const _VideoPlayerPage({required this.videoId});
-
-  @override
-  State<_VideoPlayerPage> createState() => _VideoPlayerPageState();
-}
-
-class _VideoPlayerPageState extends State<_VideoPlayerPage> {
-  late YoutubePlayerController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = YoutubePlayerController(
-      initialVideoId: widget.videoId,
-      flags: const YoutubePlayerFlags(autoPlay: true, mute: false),
-    );
-  }
+class _ArticleTile extends StatelessWidget {
+  final Map article;
+  const _ArticleTile({required this.article});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Video Course'),
-        backgroundColor: const Color(0xFFF89BA3),
-        foregroundColor: Colors.white,
-      ),
-      body: Center(
-        child: YoutubePlayer(
-          controller: _controller,
-          showVideoProgressIndicator: true,
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      color: const Color(0xFFE3F2FD),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: article['urlToImage'] != null
+            ? ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            article['urlToImage'],
+            width: 60,
+            height: 60,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported),
+          ),
+        )
+            : const Icon(Icons.image),
+        title: Text(article['title'] ?? 'No title',
+            style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text(article['source']['name'] ?? 'Unknown'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => WebViewPage(
+              url: article['url'],
+              title: article['title'],
+            ),
+          ),
         ),
       ),
     );
   }
+}
+
+class _VideoTile extends StatelessWidget {
+  final Map video;
+  const _VideoTile({required this.video});
 
   @override
-  void dispose() {
-    _controller.pause();
-    _controller.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    final id = video['id']['videoId'];
+    final sn = video['snippet'];
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      color: const Color(0xFFF6E3F7),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            sn['thumbnails']['default']['url'],
+            width: 60,
+            height: 60,
+            fit: BoxFit.cover,
+          ),
+        ),
+        title: Text(sn['title'],
+            style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text(sn['channelTitle']),
+        trailing: const Icon(Icons.play_circle),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => VideoPlayerPage(
+              videoId: id,
+              videoTitle: sn['title'],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

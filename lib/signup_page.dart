@@ -30,10 +30,7 @@ class _SignupPageState extends State<SignupPage> {
     final password = _passController.text.trim();
     final repass = _repassController.text.trim();
 
-    if (username.isEmpty ||
-        email.isEmpty ||
-        password.isEmpty ||
-        repass.isEmpty) {
+    if (username.isEmpty || email.isEmpty || password.isEmpty || repass.isEmpty) {
       Fluttertoast.showToast(msg: "Please fill in all fields");
       return;
     }
@@ -56,21 +53,16 @@ class _SignupPageState extends State<SignupPage> {
 
     try {
       final auth = FirebaseAuth.instance;
-
       final userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-
       final user = userCredential.user;
 
       if (user != null) {
         await user.sendEmailVerification();
 
-        final dbRef = FirebaseDatabase.instance
-            .ref()
-            .child('users')
-            .child(user.uid);
+        final dbRef = FirebaseDatabase.instance.ref().child('users').child(user.uid);
         await dbRef.set({
           'username': username,
           'email': email,
@@ -93,19 +85,18 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF735276),
+      backgroundColor: const Color(0xFFFFBEBE),
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 70, bottom: 10),
-              child: Center(
-                child: Image.asset(
-                  "assets/img/Bloomin_logo.png",
-                  width: 350,
-                  fit: BoxFit.contain,
-                ),
+            const SizedBox(height: 70),
+            Center(
+              child: Image.asset(
+                "assets/img/Bloomin_logo.png",
+                width: 350,
+                fit: BoxFit.contain,
+                color: const Color(0xFFD85C84),
+                colorBlendMode: BlendMode.modulate,
               ),
             ),
             const SizedBox(height: 18),
@@ -130,11 +121,7 @@ class _SignupPageState extends State<SignupPage> {
                   const SizedBox(height: 17),
                   _buildPasswordField(_passController, 'Create Password', true),
                   const SizedBox(height: 17),
-                  _buildPasswordField(
-                    _repassController,
-                    'Confirm Password',
-                    false,
-                  ),
+                  _buildPasswordField(_repassController, 'Confirm Password', false),
                   const SizedBox(height: 25),
                   _buildCreateAccountButton(),
                   const SizedBox(height: 15),
@@ -148,55 +135,46 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  Widget _buildInputField(TextEditingController controller, String label) {
-    return TextField(
-      controller: controller,
-      textAlign: TextAlign.start,
-      style: const TextStyle(
-        color: Colors.black87,
-        fontSize: 15,
-        fontFamily: 'Poppins',
-        fontWeight: FontWeight.w500,
+  InputDecoration _fieldDecoration(String hintText) {
+    return InputDecoration(
+      hintText: hintText,
+      filled: true,
+      fillColor: const Color(0xFFFFF4D7),
+      enabledBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Color(0xFF837E93)),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
-      decoration: InputDecoration(
-        hintText: label,
-        filled: true,
-        fillColor: const Color(0xFFE7DAF5),
-        labelStyle: const TextStyle(
-          color: Color(0xFF29264C),
-          fontSize: 15,
-          fontFamily: 'Poppins',
-          fontWeight: FontWeight.w600,
-        ),
-        enabledBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          borderSide: BorderSide(width: 1, color: Color(0xFF837E93)),
-        ),
-        focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          borderSide: BorderSide(width: 1, color: Color(0xFF9F7BFF)),
-        ),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Color(0xFFFF4DA6), width: 2), // bright pink
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
     );
   }
 
-  Widget _buildPasswordField(
-    TextEditingController controller,
-    String label,
-    bool isPass,
-  ) {
+  Widget _buildInputField(TextEditingController controller, String label) {
     return TextField(
       controller: controller,
-      obscureText: isPass ? _obscurePass : _obscureRepass,
-      textAlign: TextAlign.start,
       style: const TextStyle(
         color: Colors.black87,
         fontSize: 15,
         fontFamily: 'Poppins',
         fontWeight: FontWeight.w500,
       ),
-      decoration: InputDecoration(
-        hintText: label,
+      decoration: _fieldDecoration(label),
+    );
+  }
+
+  Widget _buildPasswordField(TextEditingController controller, String label, bool isPass) {
+    return TextField(
+      controller: controller,
+      obscureText: isPass ? _obscurePass : _obscureRepass,
+      style: const TextStyle(
+        color: Colors.black87,
+        fontSize: 15,
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: _fieldDecoration(label).copyWith(
         suffixIcon: IconButton(
           icon: Icon(
             isPass
@@ -212,22 +190,6 @@ class _SignupPageState extends State<SignupPage> {
               }
             });
           },
-        ),
-        filled: true,
-        fillColor: const Color(0xFFE7DAF5),
-        labelStyle: const TextStyle(
-          color: Color(0xFF29264C),
-          fontSize: 15,
-          fontFamily: 'Poppins',
-          fontWeight: FontWeight.w600,
-        ),
-        enabledBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          borderSide: BorderSide(width: 1, color: Color(0xFF837E93)),
-        ),
-        focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          borderSide: BorderSide(width: 1, color: Color(0xFF9F7BFF)),
         ),
       ),
     );

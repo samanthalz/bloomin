@@ -8,7 +8,6 @@ import 'package:bloomin/profile_page.dart';
 import 'package:bloomin/period_tracker_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:bloomin/forgot_password_page.dart';
-
 import 'auth_check_page.dart';
 
 void main() async {

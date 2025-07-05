@@ -42,9 +42,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF735276),
+      backgroundColor: const Color(0xFFFFBEBE),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF735276),
+        backgroundColor: const Color(0xFFE66F6F),
         title: const Text('Forgot Password'),
         centerTitle: true,
         foregroundColor: Colors.white,
@@ -56,7 +56,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           children: [
             const Text(
               'Enter your email and we’ll send you a reset link.',
-              style: TextStyle(color: Colors.white70, fontSize: 16),
+              style: TextStyle(color: Colors.black87, fontSize: 16),
             ),
             const SizedBox(height: 30),
             TextField(
@@ -64,13 +64,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               decoration: const InputDecoration(
                 hintText: 'Email',
                 filled: true,
-                fillColor: Color(0xFFE7DAF5),
+                fillColor: Color(0xFFFFF4D7),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Color(0xFF837E93)),
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF9F7BFF)),
+                  borderSide: BorderSide(color: Color(0xFFFF4DA6), width: 2),
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
               ),
@@ -84,22 +84,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF9F7BFF),
                 ),
-                child:
-                    _isLoading
-                        ? const CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        )
-                        : const Text(
-                          'Send Reset Link',
-                          style: TextStyle(
-                            color: Color(0xFFF0E6FD),
-                            fontSize: 15,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                )
+                    : const Text(
+                  'Send Reset Link',
+                  style: TextStyle(
+                    color: Color(0xFFF0E6FD),
+                    fontSize: 15,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ),
           ],
